@@ -1,0 +1,64 @@
+#!/bin/bash -f 
+#!!!! Check the coordinates name in netcdf file - longitude, latitude or lon, lat => fix netcdf.dv.f file
+:
+d=erain
+echo 'ok1'
+H=( "0S" "0N" )
+echo 'ok2'
+#lev="10m_glob"
+lev="10"
+:
+fy=1979
+y=2014
+ly=2016
+ey=2016
+#lmon is the the beginning of y=ey+1:
+lmon=''
+while [ $y -le $ly ]
+do
+py=$[$y - 1]
+ny=$[$y + 1]
+:
+if [ $lev -eq "10" ];then
+DATA="/work/irudeva/DATA/ERAint/"${lev}m
+else
+DATA="/work/irudeva/DATA/ERAint/"${lev}
+fi
+:
+#ftp -i -n 128.250.120.134 <<EOF
+#user stilia 123456
+#binary
+#mput  MERRA*$py*
+#mget MERRA*$py* MERRA*$y* MERRA*$ny*
+#EOF
+#cd $Dir
+:
+for nH in 1
+do
+:
+echo $y ${H[$nH]}
+echo 'start reading netcdf'
+./netcdf.dv.$d.sh $y ${H[$nH]} $lev $fy $ey $lmon
+echo 'start searching fronts'
+./front.$d.sh $y ${H[$nH]} $lev
+echo 'start tracking'
+./ftrk.sh $y ${H[$nH]} $lev
+rm fort.21
+done
+:
+#cd $DATA
+#ftp -i -n 128.250.120.134 <<EOF
+#user stilia 123456
+#binary
+#mput  MERRA*$py*
+#mput MERRA*$py* MERRA*$y* MERRA*$ny*
+#EOF
+#rm  MERRA*$py* MERRA*$y* MERRA*$ny*
+#rm MERRA*$py*
+#cd $Dir
+#rm $DATA/wget.txt $DATA/wget1.txt
+y=$[$y+1]
+done
+
+
+
