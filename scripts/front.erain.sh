@@ -11,8 +11,8 @@ set lev = $3
  set prog1=seg2.$d
  gfortran -o $prog1 $prog1.f /work/irudeva/include/libeda.a
 
-set Din = ../../$d/$lev
-set Dout = ../../$d/$lev
+set Din = ../output/$d/$lev
+set Dout = ../output/$d/$lev
 
 set x = all # modified crit I - actually I and VII
 set cdv = 2 #critical dv (_C option in front_seg1)
@@ -29,11 +29,11 @@ set y=$1
 #while ($y <= 2007)
 set farea = $Dout/farea$lev.$d.$y.${H}.dat
 
- iecho 'start $prog'
+ echo 'start ' $prog
  ./${prog} -C $cdv -dv $Din/dv${lev}.$d.$y.${H}.cmp  -a $farea 
 #
  ./${prog1} -i $farea -o $Dout/front${lev}.$d.$y.$H.dat -h $H
-  \rm -f $farea
+#  \rm -f $farea
 #
 #  @ y ++
 #end

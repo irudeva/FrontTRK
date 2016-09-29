@@ -1,16 +1,15 @@
 :
 d=erain
 prog=netcdf.dv.$d
-#gfortran -o $prog $prog.f /work/irudeva/include/libnetcdf.a
 gfortran -o $prog $prog.f  -lnetcdff -lnetcdf
 :
 #lev="10m"
 lev=$3
-Dout=../../$d/${lev}
+Dout=../output/$d/${lev}
 #HS=0N
 HS=$2
 if [ $lev -eq "10" ]; then
-Dnc="/work/irudeva/DATA/ERAint/10m/$d.uv_10m."
+Dnc="/Users/irudeva/work/DATA/ERAint/$d.uv_10m."
 else
 Dnc="/work/irudeva/DATA/ERAint/$lev/$d.uv_$lev."
 fi

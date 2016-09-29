@@ -1,7 +1,7 @@
       program netsdf2cmp
-	
-	include '/usr/local/include/netcdf.inc'
-        
+
+	include '/opt/local/include/netcdf.inc'
+
         character*120 Dnc,ncfile2,ncfile,cmpfile,command,head*80
 	character hs*2,uvar*4,vvar*4,dvvarcmp*5,lmon*12
 	real miss
@@ -39,10 +39,10 @@
 	read (*,'(a)') cmpfile
 	read (*,'(a)') dvvarcmp
 	read (*,*) miss
-	write(*,'(''CMP file: '',a)') cmpfile	
-	open (20,file=cmpfile,form='unformatted')	
+	write(*,'(''CMP file: '',a)') cmpfile
+	open (20,file=cmpfile,form='unformatted')
 
-	do 1 y=sy,ey;print*, y	
+	do 1 y=sy,ey;print*, y
 	 if (mod(y,4)==0)then
 	 open(10,file='dates366.dat',action='read')
 	 else
@@ -58,7 +58,7 @@
 
 	write(command,'("ls ",a,".gz")')ncfile(:len_trim(ncfile))
 	status=system(command)
-	print*, command 
+	print*, command
 	if(status==0)then
 	 write(command,'("gunzip ",a,".gz")')ncfile(:len_trim(ncfile))
 	STATUS=SYSTEM(command)
@@ -75,7 +75,7 @@
 
 	call ncdinq(ncid,londimid,dimname,lonsize, errorcode)
 	call ncdinq(ncid,latdimid,dimname,latsize, errorcode)
-	print*, "ok"	
+	print*, "ok"
 	allocate (longitudes(lonsize),latitudes(latsize))
 	if(latsize==121)then
 	if(hs=='0N')then
@@ -83,8 +83,8 @@
 	 elat=(latsize-1)/2+1  !!!!for SH!!!!
 	 j0=1
 	elseif(hs=='0S')then
-	 slat=(latsize-1)/2+1 
-	 elat=latsize 
+	 slat=(latsize-1)/2+1
+	 elat=latsize
 	else
 	 write(*,'("ERROR: Check hs")')
 	endif
@@ -103,14 +103,14 @@
 	 j2=slat
 	 j0=-1
 	endif
-	
+
 
 	lonvarid=ncvid(ncid,'lon',errorcode)
 	latvarid=ncvid(ncid,'lat',errorcode)
 	uvarid = ncvid(ncid,uvar,errorcode)
 	vvarid = ncvid(ncid,vvar,errorcode)
 
-	print*, "ok"	
+	print*, "ok"
 	startcoo(1)=1
 	countcoo(1)=lonsize
         call ncvgt(ncid,lonvarid,startcoo(1),countcoo(1),longitudes,
@@ -125,7 +125,7 @@
 	 write(21,'(i10)')elat-slat+1
 	 write(20)(latitudes(i),i=j1,j2,j0)
 	 write(21,'(61f10.2)')(latitudes(i),i=j1,j2,j0)
-	
+
 	 if(all(longitudes>=0.).and.all(longitudes<360.))then
 	 write(20)lonsize
 	 write(20)(longitudes(i),i=1,lonsize)
@@ -141,9 +141,9 @@
 	else
 	 write(*,'("ERROR: Check longitudes")')
 	 stop
-	endif 
+	endif
 
-	print*, "ok"	
+	print*, "ok"
 	allocate(u(lonsize,latsize),v(lonsize,latsize)
      &          ,su(lonsize,latsize),sv(lonsize,latsize)
      &          ,u1(lonsize,latsize),v1(lonsize,latsize)
@@ -156,7 +156,7 @@
 	countcoo(3)=1
 	endif   !y==sy
 !**************************************************************************
-	
+
 	call ncagt(ncid,uvarid,"scale_factor",uscale,errorcode)
 	call ncagt(ncid,uvarid,"add_offset",uoffset,errorcode)
 	print*, "uscale=",uscale
@@ -165,16 +165,16 @@
 	call ncagt(ncid,vvarid,"add_offset",voffset,errorcode)
 	print*, "vscale=",vscale
 	print*, "voffset=",voffset
-	
+
 	call ncagt(ncid,uvarid,'_FillValue',missv,
      &              errorcode)
-	
+
 	t1=1
 	t2=365
 	 if (mod(y,4)==0)t2=366
 	if(y==sy)then
 	t1=0
-	 loop_a: do 
+	 loop_a: do
 	  read(10,'(2i2)',end=9)m,d
 	  t1=t1+1
 	  if(m==sm.and.d==sd)then
@@ -184,7 +184,7 @@
 	 enddo loop_a
 	elseif(y==ey)then
 	t2=0
-	 loop_b: do 
+	 loop_b: do
 	  read(10,'(2i2)',end=9)m,d
 	  t2=t2+1
 	  if(m==em.and.d==ed)then
@@ -218,7 +218,7 @@
 
 
 !	!write(25,'(4f10.2)') ((longitudes(i),latitudes(j),u(i,j),v(i,j),
-!	write(25,'(2f10.2,2e14.6)') 
+!	write(25,'(2f10.2,2e14.6)')
 !     & ((longitudes(i),latitudes(j),u(i,j),v(i,j),
 !     & i=1,lonsize),j=slat,elat)
 
@@ -232,7 +232,7 @@
 !	call ncvgt(ncid2,uvarid,startcoo,countcoo,u1,
 !     &              errorcode)
 
-	
+
 !	do j=slat,elat
 !	do i=1,lonsize
 !	if(longitudes(i)<0.)then
@@ -245,14 +245,14 @@
 !endtmp
 
 !******end first step *************************************************
-	
+
 
         startcoo(3)=(t-1)*4+th;print*, startcoo(3)
 	call ncvgt(ncid,uvarid,startcoo,countcoo,su
      &              ,errorcode)
 	call ncvgt(ncid,vvarid,startcoo,countcoo,sv
      &              ,errorcode)
-	
+
 	u1=float(su)*uscale+uoffset
 	v1=float(sv)*vscale+voffset
 	do j=j1,j2,j0
@@ -263,18 +263,18 @@
 	enddo
 
 	print*, u1(1,j1)
-	
+
 	if(crit/=0)then
       dv=miss
 	do 15 j=slat,elat
 	do 15 i=1,lonsize
 	 if (u(i,j)>=0..and.u1(i,j)>=0.)then
 	  if(hs=='0S'.and.v(i,j)<=0..and.v1(i,j)>0.)then
-           if(v1(i,j)/=miss.and.v(i,j).ne.miss)              
+           if(v1(i,j)/=miss.and.v(i,j).ne.miss)
      &	 		    dv(i,j)=v1(i,j)-v(i,j)
 	  endif
 	  if(hs=='0N'.and.v(i,j)>=0..and.v1(i,j)<0.)then
-           if(v1(i,j)/=miss.and.v(i,j).ne.miss)              
+           if(v1(i,j)/=miss.and.v(i,j).ne.miss)
      &                      dv(i,j)=v(i,j)-v1(i,j)
 	  endif
 	 endif
@@ -306,18 +306,18 @@
 !	enddo
 !	stop
 !
-!endtmp	
+!endtmp
 !	write(23,'(7f10.2)')((longitudes(i),latitudes(j),u(i,j),u1(i,j),
 !     & v(i,j),v1(i,j),dv(i,j),i=1,lonsize),j=j1,j2,j0)
 !	stop
 !	endif
-	
-	 write(20)((dv(i,j),i=1,lonsize),j=j1,j2,j0)	
+
+	 write(20)((dv(i,j),i=1,lonsize),j=j1,j2,j0)
 	 write(21,'(240f10.2)')((dv(i,j),i=1,lonsize),j=j1,j2,j0)
 !	 write(22,'(240f10.2)')((v(i,j),i=lonsize/2+1,lonsize),j=j1,j2,j0)
 !	 write(23,'(240f10.2)')((v1(i,j),i=lonsize/2+1,lonsize),j=j1,j2,j0)
 	endif !crit/=0
-		
+
 	 u=u1
 	 v=v1
 	 y0=y
@@ -337,7 +337,7 @@
 	endif
 
 11	enddo !time
-		
+
 88	close(10)
 	call ncclos(ncid,errorcode)
 
@@ -351,7 +351,7 @@
 	close(20)
 	!close(21,status='delete')
 	close(21)
-	
+
 
 8	stop
 

@@ -9,8 +9,8 @@ echo 'ok2'
 lev="10"
 :
 fy=1979
-y=2014
-ly=2016
+y=2015
+ly=2015
 ey=2016
 #lmon is the the beginning of y=ey+1:
 lmon=''
@@ -38,7 +38,7 @@ do
 :
 echo $y ${H[$nH]}
 echo 'start reading netcdf'
-./netcdf.dv.$d.sh $y ${H[$nH]} $lev $fy $ey $lmon
+#./netcdf.dv.$d.sh $y ${H[$nH]} $lev $fy $ey $lmon
 echo 'start searching fronts'
 ./front.$d.sh $y ${H[$nH]} $lev
 echo 'start tracking'
